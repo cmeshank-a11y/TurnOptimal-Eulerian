@@ -1,0 +1,140 @@
+Turn-penalty-optimal Eulerian collection routes
+================================================
+Environment : GNU Octave 8.4.0
+Run started : 2026-10-26 12:01:08
+
+1. Ward network
+---------------
+n = 16 intersections, m = 27 streets, total length 4546 m, demand 3544.3 kg
+  ID   Street    Length  Class                  Demand(kg)
+  e1   A1  -A2     165   Residential (medium)     90.75
+  e2   A2  -A3     170   Residential (medium)     93.50
+  e3   A3  -A4     170   Residential (medium)     93.50
+  e4   B1  -B2     164   Commercial              213.20
+  e5   B2  -B3     171   Commercial              222.30
+  e6   B3  -B4     169   Commercial              219.70
+  e7   C1  -C2     168   Residential (high)      142.80
+  e8   C2  -C3     169   Residential (high)      143.65
+  e9   C3  -C4     172   Residential (high)      146.20
+  e10  D1  -D2     166   Residential (medium)     91.30
+  e11  D2  -D3     169   Residential (medium)     92.95
+  e12  D3  -D4     177   Residential (medium)     97.35
+  e13  A1  -B1     152   Residential (medium)     83.60
+  e14  B1  -C1     153   Residential (medium)     84.15
+  e15  C1  -D1     147   Residential (medium)     80.85
+  e16  A2  -B2     168   Residential (high)      142.80
+  e17  B2  -C2     153   Residential (high)      130.05
+  e18  C2  -D2     149   Residential (high)      126.65
+  e19  A3  -B3     141   Residential (high)      119.85
+  e20  B3  -C3     152   Residential (high)      129.20
+  e21  C3  -D3     149   Residential (high)      126.65
+  e22  A4  -B4     160   Residential (medium)     88.00
+  e23  B4  -C4     152   Residential (medium)     83.60
+  e24  C4  -D4     149   Residential (medium)     81.95
+  e25  A2  -B1     234   Residential (medium)    128.70
+  e26  B2  -C3     228   Commercial              296.40
+  e27  C4  -D3     229   Residential (high)      194.65
+Degrees: A1:2 A2:4 A3:3 A4:2 B1:4 B2:5 B3:4 B4:3 C1:3 C2:4 C3:5 C4:4 D1:2 D2:3 D3:4 D4:2 
+Handshake: sum deg = 54 = 2m = 54 -> PASS
+Odd vertices (6): A3, B2, B4, C1, C3, D2
+
+  class 1 (Residential (medium)): 13 streets, 2164 m, 1190.2 kg
+  class 2 (Residential (high)): 10 streets, 1650 m, 1402.5 kg
+  class 3 (Commercial): 4 streets, 732 m, 951.6 kg
+
+2. Closed parity repair
+-----------------------
+15 perfect matchings of the odd set; weights 851 .. 1496 m
+Subset-DP optimum 851 m, enumeration optimum 851 m -> PASS
+  C1-D2 : 313 m via C1-D1-D2
+  B2-C3 : 228 m via B2-C3
+  A3-B4 : 310 m via A3-B3-B4
+Duplicated streets (5): e6 e10 e15 e19 e26 ; deadhead 851 m
+Repaired multigraph: 32 edges, 5397 m; all degrees even -> PASS
+
+3. Turn model and transition systems
+------------------------------------
+Penalties (s): straight 0, left 6, right 18, U-turn 40; |theta|<=30 straight, >150 U
+Pairings per vertex: [1 3 3 1 3 15 15 3 3 3 15 3 3 3 3 1]
+Transition systems: prod (d-1)!! = 1.993e+08 (log10 = 8.299)
+Local lower bound LB = 120 s
+
+4. Circuits
+-----------
+Hierholzer baseline : 342 s (single circuit PASS)
+Heuristic           : start 1 closed trails, 0 merges, after merge 216 s, after LS 172 s (3 moves, 3 passes)
+Exact 0-1 programme : 172 s, 248 variables (216 transitions), 9 rounds, 20 cuts, 0.13 s -> ok PASS
+Re-evaluated optimum: 172 s (single circuit PASS, equals ILP objective PASS)
+Gap to LB: optimum 43.3% above LB; baseline 98.8% above optimum
+Turn counts [S L R U]: baseline [10 10 9 3], heuristic [13 16 2 1], optimum [13 16 2 1]
+Validation of optimum:
+  Traversals = edges of repaired multigraph            32         32         PASS
+  Every multigraph edge used exactly once              yes        yes        PASS
+  Consecutive traversals share a vertex (closed walk)  yes        yes        PASS
+  Each street driven 1 + (#duplicates) times           yes        yes        PASS
+  Each street serviced exactly once                    yes        yes        PASS
+  Route length (m) = streets + T-join                  5397       5397       PASS
+Optimal circuit (from A1): A1-A2-A3-A4-B4-B3-A3-B3-C3-B2-B1-A2-B2-C2-D2-D1-C1-C2-C3-C4-D3-C3-B2-B3-B4-C4-D4-D3-D2-D1-C1-B1-A1
+Turn sequence: SSLLLUSLRLLSSLLLSSLLRLSLSLSSLSSL
+
+5. Uniform random Eulerian circuits
+-----------------------------------
+5000 accepted of 27105 draws (p = 0.1845, 95% CI 0.1799-0.1891), 44.7 s
+Estimated number of Eulerian circuits ec(G) = 3.68e+07 (95% CI 3.58e+07-3.77e+07)
+Turn delay over random circuits: mean 340.0 s, sd 43.4, median 342, min 186, max 488
+Fraction of random circuits within 10% of optimum: 0.0002 ; optimum hit: 0 of 5000
+Optimum percentile among random circuits: 0.000%; baseline percentile: 48.7%
+Mean turn counts [S L R U] of random circuits: [6.1 14.4 9.4 2.1]
+
+6. All 15 repairs: deadhead versus optimal turn delay
+------------------------------------------------
+  M1  A3B2,B4C1,C3D2               deadhead  945 m  turn* 132 s  (Hierholzer 302 s)  tour 50.5 min
+  M2  A3B2,B4C3,C1D2               deadhead  946 m  turn* 102 s  (Hierholzer 314 s)  tour 50.0 min
+  M3  A3B2,B4D2,C1C3               deadhead 1199 m  turn* 132 s  (Hierholzer 330 s)  tour 51.3 min
+  M4  A3B4,B2C1,C3D2               deadhead  945 m  turn* 132 s  (Hierholzer 302 s)  tour 50.5 min
+  M5  A3B4,B2C3,C1D2               deadhead  851 m  turn* 172 s  (Hierholzer 342 s)  tour 50.9 min
+  M6  A3B4,B2D2,C1C3               deadhead  949 m  turn* 132 s  (Hierholzer 320 s)  tour 50.5 min
+  M7  A3C1,B2B4,C3D2               deadhead 1215 m  turn* 132 s  (Hierholzer 292 s)  tour 51.3 min
+  M8  A3C1,B2C3,B4D2               deadhead 1335 m  turn* 132 s  (Hierholzer 336 s)  tour 51.7 min
+  M9  A3C1,B2D2,B4C3               deadhead 1180 m  turn* 132 s  (Hierholzer 320 s)  tour 51.2 min
+  M10 A3C3,B2B4,C1D2               deadhead  946 m  turn* 102 s  (Hierholzer 314 s)  tour 50.0 min
+  M11 A3C3,B2C1,B4D2               deadhead 1160 m  turn* 132 s  (Hierholzer 288 s)  tour 51.1 min
+  M12 A3C3,B2D2,B4C1               deadhead 1252 m  turn* 126 s  (Hierholzer 302 s)  tour 51.3 min
+  M13 A3D2,B2B4,C1C3               deadhead  950 m  turn* 132 s  (Hierholzer 326 s)  tour 50.5 min
+  M14 A3D2,B2C1,B4C3               deadhead  945 m  turn* 132 s  (Hierholzer 302 s)  tour 50.5 min
+  M15 A3D2,B2C3,B4C1               deadhead 1496 m  turn* 126 s  (Hierholzer 320 s)  tour 52.0 min
+Distance-optimal repair M5: tour 50.88 min; time-optimal repair M2: tour 50.00 min
+
+7. Capacity-feasible trips (Q = 1500 kg, total demand 3544.3 kg)
+---------------------------------------------
+Baseline: 3 trips, shift 114.15 min = service 45.46 + in-ward deadhead 1.45 + access 18.48 + turns 3.77 + unloading 45.00
+          distance 13638 m = service 4546 + in-ward deadhead 482 + access 8610; loads [1448 1463 633] kg
+Optimum : 3 trips, shift 112.48 min = service 45.46 + in-ward deadhead 2.05 + access 17.40 + turns 2.57 + unloading 45.00
+          distance 13529 m = service 4546 + in-ward deadhead 682 + access 8301; loads [1195 1457 893] kg
+Random circuits (400): shift 114.85 +- 0.96 min (min 111.87, max 117.66), turn time in trips 278.6 s; 92.2 s
+Shift saving of optimum: 100.6 s vs baseline (1.47%), 142.4 s vs random mean (2.07%)
+Annual (300 collection days): 8.4 h saved vs baseline, 11.9 h vs random mean
+Right turns avoided per year vs baseline: 2100
+
+8. Sensitivity to turn penalties (reduction % vs baseline / right turns in optimum)
+   tL\tR       6     12     18     24     30     36
+      0   89.7/3 84.2/3 80.9/3 81.0/1 82.1/1 82.9/1
+      3   61.8/5 62.8/3 63.5/3 64.5/1 67.6/1 70.0/1
+      6   48.7/10 45.8/3 49.7/2 53.5/2 56.4/2 58.7/1
+      9   47.1/14 37.7/6 40.9/2 45.5/2 49.2/2 52.1/2
+     12   45.8/14 31.0/8 33.3/2 38.6/2 42.7/2 46.1/2
+
+9. Capacity sensitivity: Q = 800..3600 kg; trips 1..5; saving -835.3..185.6 s
+  Q = 1200 kg: baseline 119.74 min (3 trips), turn-optimal 133.66 min (4 trips), split-aware LS 114.21 min (3 trips, 2 moves)
+      split-aware circuit: turn delay 256 s, turns [S L R U] = [11 12 8 1]
+  Q = 1500 kg: baseline 114.15 min (3 trips), turn-optimal 112.48 min (3 trips), split-aware LS 111.07 min (3 trips, 6 moves)
+      split-aware circuit: turn delay 268 s, turns [S L R U] = [9 14 8 1]
+After split-aware LS: saving vs baseline 53.8..331.9 s over all payloads
+
+10. Random-instance benchmark (10 instances per size, diagonal prob 0.35)
+  3x4: n=12, m=18.5, logTS=5.5 | gap heur 16.2% (max 50.0), baseline +67.4%, LB gap 21.5% | ILP 0.02 s (max 0.10), heur 0.05 s | B&B checks 9/9 agree
+  4x5: n=20, m=34.8, logTS=11.1 | gap heur 21.5% (max 34.4), baseline +103.3%, LB gap 18.6% | ILP 0.05 s (max 0.14), heur 0.22 s | B&B checks 0/0 agree
+  5x6: n=30, m=56.2, logTS=18.7 | gap heur 15.5% (max 32.5), baseline +113.8%, LB gap 22.0% | ILP 0.11 s (max 0.26), heur 0.52 s | B&B checks 0/0 agree
+  6x7: n=42, m=81.3, logTS=27.6 | gap heur 24.0% (max 34.3), baseline +121.5%, LB gap 21.5% | ILP 0.98 s (max 3.44), heur 1.07 s | B&B checks 0/0 agree
+
+Done: 2026-10-26 12:16:49

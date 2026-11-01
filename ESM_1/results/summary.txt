@@ -1,0 +1,7 @@
+Environment              : GNU Octave 8.4.0
+Network                  : n=16, m=27, 4546 m, 6 odd vertices
+Closed repair            : +851 m deadhead (5 duplicated streets)
+Transition systems       : 10^8.299 ; ec(G) ~ 3.68e+07
+Turn delay [s]           : LB 120 | optimum 172 | heuristic 172 | Hierholzer 342 | random mean 340.0
+Right turns              : optimum 2 | Hierholzer 9 | random mean 9.4
+Shift time [min]         : optimum 112.48 | Hierholzer 114.15 | random mean 114.85 (3 trips)
